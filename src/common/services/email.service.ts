@@ -26,7 +26,11 @@ export class EmailService {
     return Promise.resolve();
   }
 
-  async sendWelcomeEmail(email: string, name: string, slug: string): Promise<void> {
+  async sendWelcomeEmail(
+    email: string,
+    name: string,
+    slug: string,
+  ): Promise<void> {
     await this.sendEmail({
       to: email,
       subject: 'Bem-vindo à Plataforma de Excursões',
@@ -45,7 +49,11 @@ export class EmailService {
     });
   }
 
-  async sendInviteEmail(email: string, tenantName: string, token: string): Promise<void> {
+  async sendInviteEmail(
+    email: string,
+    tenantName: string,
+    token: string,
+  ): Promise<void> {
     await this.sendEmail({
       to: email,
       subject: `Convite para ${tenantName}`,
@@ -59,4 +67,3 @@ export class EmailService {
     });
   }
 }
-

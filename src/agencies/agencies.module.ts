@@ -25,9 +25,9 @@ import { BoardingLocationsService } from '../boarding-locations/boarding-locatio
 import { BoardingLocationsController } from '../boarding-locations/boarding-locations.controller';
 import { BoardingLocationsRepository } from '../boarding-locations/boarding-locations.repository';
 
-import { TripCategoriesService } from '../trip-categories/trip-categories.service';
-import { TripCategoriesController } from '../trip-categories/trip-categories.controller';
-import { TripCategoriesRepository } from '../trip-categories/trip-categories.repository';
+import { CategoriesService } from '../categories/categories.service';
+import { CategoriesController } from '../categories/categories.controller';
+import { CategoriesRepository } from '../categories/categories.repository';
 
 import { AgeRangesService } from '../age-ranges/age-ranges.service';
 import { AgeRangesController } from '../age-ranges/age-ranges.controller';
@@ -42,7 +42,7 @@ import { AgeRangesRepository } from '../age-ranges/age-ranges.repository';
     AgencyEmailsController,
     AgencySocialsController,
     BoardingLocationsController,
-    TripCategoriesController,
+    CategoriesController,
     AgeRangesController,
   ],
   providers: [
@@ -52,7 +52,7 @@ import { AgeRangesRepository } from '../age-ranges/age-ranges.repository';
     AgencyEmailsService,
     AgencySocialsService,
     BoardingLocationsService,
-    TripCategoriesService,
+    CategoriesService,
     AgeRangesService,
     AgenciesRepository,
     AgencyAddressesRepository,
@@ -60,7 +60,7 @@ import { AgeRangesRepository } from '../age-ranges/age-ranges.repository';
     AgencyEmailsRepository,
     AgencySocialsRepository,
     BoardingLocationsRepository,
-    TripCategoriesRepository,
+    CategoriesRepository,
     AgeRangesRepository,
   ],
   exports: [
@@ -76,8 +76,8 @@ import { AgeRangesRepository } from '../age-ranges/age-ranges.repository';
     AgencySocialsRepository,
     BoardingLocationsService,
     BoardingLocationsRepository,
-    TripCategoriesService,
-    TripCategoriesRepository,
+    CategoriesService,
+    CategoriesRepository,
     AgeRangesService,
     AgeRangesRepository,
   ],

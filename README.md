@@ -91,7 +91,8 @@ await db.insert(tenants).values({
 const allTenants = await db.select().from(tenants);
 
 // Buscar por slug
-const tenant = await db.select()
+const tenant = await db
+  .select()
   .from(tenants)
   .where(eq(tenants.slug, 'minha-empresa'))
   .limit(1);
@@ -100,7 +101,8 @@ const tenant = await db.select()
 #### Exemplo: Atualizar dados
 
 ```typescript
-await db.update(tenants)
+await db
+  .update(tenants)
   .set({ plan: 'enterprise' })
   .where(eq(tenants.slug, 'minha-empresa'));
 ```
@@ -108,8 +110,7 @@ await db.update(tenants)
 #### Exemplo: Deletar dados
 
 ```typescript
-await db.delete(tenants)
-  .where(eq(tenants.slug, 'minha-empresa'));
+await db.delete(tenants).where(eq(tenants.slug, 'minha-empresa'));
 ```
 
 ### 🏗️ Criando Novas Tabelas
@@ -119,7 +120,9 @@ await db.delete(tenants)
 ```typescript
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
-  tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
+  tenantId: uuid('tenant_id')
+    .references(() => tenants.id)
+    .notNull(),
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
@@ -178,6 +181,25 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## criar bucket local
+
+```
+aws --endpoint-url=http://localhost:4566 s3 mb s3://excursion-management-ag-bora-de-excursao --profile localstack
+
+```
+
+## Listar buckets
+
+```
+aws --endpoint-url=http://localhost:4566 s3 ls --profile localstack
+```
+
+## Deletar bucket
+
+````
+aws --endpoint-url=http://localhost:4566 s3 rb s3://excursion-management-ag-bora-de-excursao --profile localstack --force
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
@@ -217,3 +239,4 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+````

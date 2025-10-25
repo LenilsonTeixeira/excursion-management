@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TripCategoriesController } from './trip-categories.controller';
-import { TripCategoriesService } from './trip-categories.service';
+import { CategoriesController } from './categories.controller';
+import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtPayload } from '../common/decorators/current-user.decorator';
 
-describe('TripCategoriesController', () => {
-  let controller: TripCategoriesController;
-  let service: TripCategoriesService;
+describe('CategoriesController', () => {
+  let controller: CategoriesController;
+  let service: CategoriesService;
 
-  const mockTripCategory = {
+  const mockCategory = {
     id: 'trip-category-id-1',
     name: 'Bate e Volta',
     agencyId: 'agency-id-1',
@@ -17,11 +17,11 @@ describe('TripCategoriesController', () => {
     updatedAt: new Date('2025-01-01'),
   };
 
-  const mockCreateTripCategoryDto = {
+  const mockCreateCategoryDto = {
     name: 'Bate e Volta',
   };
 
-  const mockUpdateTripCategoryDto = {
+  const mockUpdateCategoryDto = {
     name: 'Viagem com Hospedagem',
   };
 
@@ -41,10 +41,10 @@ describe('TripCategoriesController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [TripCategoriesController],
+      controllers: [CategoriesController],
       providers: [
         {
-          provide: TripCategoriesService,
+          provide: CategoriesService,
           useValue: {
             create: jest.fn(),
             findAllByAgency: jest.fn(),
@@ -65,8 +65,8 @@ describe('TripCategoriesController', () => {
       .useValue({ canActivate: () => true })
       .compile();
 
-    controller = module.get<TripCategoriesController>(TripCategoriesController);
-    service = module.get<TripCategoriesService>(TripCategoriesService);
+    controller = module.get<CategoriesController>(CategoriesController);
+    service = module.get<CategoriesService>(CategoriesService);
   });
 
   it('should be defined', () => {
@@ -75,24 +75,24 @@ describe('TripCategoriesController', () => {
 
   describe('create', () => {
     it('should create a trip category', async () => {
-      jest.spyOn(service, 'create').mockResolvedValue(mockTripCategory);
+      jest.spyOn(service, 'create').mockResolvedValue(mockCategory);
 
       const result = await controller.create(
         'agency-id-1',
-        mockCreateTripCategoryDto,
+        mockCreateCategoryDto,
       );
 
       expect(service.create).toHaveBeenCalledWith(
         'agency-id-1',
-        mockCreateTripCategoryDto,
+        mockCreateCategoryDto,
       );
-      expect(result).toEqual(mockTripCategory);
+      expect(result).toEqual(mockCategory);
     });
   });
 
   describe('findAllByAgency', () => {
     it('should return all trip categories for an agency', async () => {
-      const tripCategories = [mockTripCategory];
+      const tripCategories = [mockCategory];
       jest.spyOn(service, 'findAllByAgency').mockResolvedValue(tripCategories);
 
       const result = await controller.findAllByAgency('agency-id-1');
@@ -104,7 +104,7 @@ describe('TripCategoriesController', () => {
 
   describe('findOne', () => {
     it('should return a trip category for superadmin', async () => {
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTripCategory);
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockCategory);
 
       const result = await controller.findOne(
         'agency-id-1',
@@ -113,13 +113,11 @@ describe('TripCategoriesController', () => {
       );
 
       expect(service.findOne).toHaveBeenCalledWith('trip-category-id-1');
-      expect(result).toEqual(mockTripCategory);
+      expect(result).toEqual(mockCategory);
     });
 
     it('should return a trip category for agency_admin from same agency', async () => {
-      jest
-        .spyOn(service, 'findOneByAgency')
-        .mockResolvedValue(mockTripCategory);
+      jest.spyOn(service, 'findOneByAgency').mockResolvedValue(mockCategory);
 
       const result = await controller.findOne(
         'agency-id-1',
@@ -131,54 +129,52 @@ describe('TripCategoriesController', () => {
         'trip-category-id-1',
         'agency-id-1',
       );
-      expect(result).toEqual(mockTripCategory);
+      expect(result).toEqual(mockCategory);
     });
   });
 
   describe('update', () => {
     it('should update a trip category for superadmin', async () => {
-      const updatedTripCategory = {
-        ...mockTripCategory,
-        ...mockUpdateTripCategoryDto,
+      const updatedCategory = {
+        ...mockCategory,
+        ...mockUpdateCategoryDto,
       };
-      jest.spyOn(service, 'update').mockResolvedValue(updatedTripCategory);
+      jest.spyOn(service, 'update').mockResolvedValue(updatedCategory);
 
       const result = await controller.update(
         'agency-id-1',
         'trip-category-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
         mockSuperAdminUser,
       );
 
       expect(service.update).toHaveBeenCalledWith(
         'trip-category-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
       );
-      expect(result).toEqual(updatedTripCategory);
+      expect(result).toEqual(updatedCategory);
     });
 
     it('should update a trip category for agency_admin from same agency', async () => {
-      const updatedTripCategory = {
-        ...mockTripCategory,
-        ...mockUpdateTripCategoryDto,
+      const updatedCategory = {
+        ...mockCategory,
+        ...mockUpdateCategoryDto,
       };
-      jest
-        .spyOn(service, 'updateByAgency')
-        .mockResolvedValue(updatedTripCategory);
+      jest.spyOn(service, 'updateByAgency').mockResolvedValue(updatedCategory);
 
       const result = await controller.update(
         'agency-id-1',
         'trip-category-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
         mockAgencyAdminUser,
       );
 
       expect(service.updateByAgency).toHaveBeenCalledWith(
         'trip-category-id-1',
         'agency-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
       );
-      expect(result).toEqual(updatedTripCategory);
+      expect(result).toEqual(updatedCategory);
     });
   });
 

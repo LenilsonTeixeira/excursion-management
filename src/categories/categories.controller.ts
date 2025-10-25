@@ -19,9 +19,9 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
-import { TripCategoriesService } from './trip-categories.service';
-import { CreateTripCategoryDto } from './dto/create-trip-category.dto';
-import { UpdateTripCategoryDto } from './dto/update-trip-category.dto';
+import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { AllowRoles } from '../common/decorators/allow-roles.decorator';
@@ -29,12 +29,12 @@ import { RequireOwnership } from '../common/decorators/require-ownership.decorat
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtPayload } from '../common/decorators/current-user.decorator';
 
-@ApiTags('trip-categories')
+@ApiTags('categories')
 @ApiBearerAuth()
-@Controller('agencies/:agencyId/trip-categories')
+@Controller('agencies/:agencyId/categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class TripCategoriesController {
-  constructor(private readonly tripCategoriesService: TripCategoriesService) {}
+export class CategoriesController {
+  constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
   @AllowRoles('superadmin', 'agency_admin')
@@ -50,7 +50,7 @@ export class TripCategoriesController {
     type: 'string',
     format: 'uuid',
   })
-  @ApiBody({ type: CreateTripCategoryDto })
+  @ApiBody({ type: CreateCategoryDto })
   @ApiResponse({
     status: 201,
     description: 'Categoria de viagem criada com sucesso',
@@ -74,9 +74,9 @@ export class TripCategoriesController {
   })
   async create(
     @Param('agencyId', ParseUUIDPipe) agencyId: string,
-    @Body() createTripCategoryDto: CreateTripCategoryDto,
+    @Body() createCategoryDto: CreateCategoryDto,
   ) {
-    return this.tripCategoriesService.create(agencyId, createTripCategoryDto);
+    return this.categoriesService.create(agencyId, createCategoryDto);
   }
 
   @Get()
@@ -113,10 +113,10 @@ export class TripCategoriesController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   async findAllByAgency(@Param('agencyId', ParseUUIDPipe) agencyId: string) {
-    return this.tripCategoriesService.findAllByAgency(agencyId);
+    return this.categoriesService.findAllByAgency(agencyId);
   }
 
-  @Get(':tripCategoryId')
+  @Get(':categoryId')
   @AllowRoles('superadmin', 'agency_admin')
   @RequireOwnership()
   @ApiOperation({
@@ -131,7 +131,7 @@ export class TripCategoriesController {
     format: 'uuid',
   })
   @ApiParam({
-    name: 'tripCategoryId',
+    name: 'categoryId',
     description: 'ID da categoria de viagem',
     type: 'string',
     format: 'uuid',
@@ -158,19 +158,19 @@ export class TripCategoriesController {
   })
   async findOne(
     @Param('agencyId', ParseUUIDPipe) agencyId: string,
-    @Param('tripCategoryId', ParseUUIDPipe) tripCategoryId: string,
+    @Param('categoryId', ParseUUIDPipe) categoryId: string,
     @CurrentUser() user: JwtPayload,
   ) {
     // Se for superadmin, pode acessar qualquer categoria
     if (user.role === 'superadmin') {
-      return this.tripCategoriesService.findOne(tripCategoryId);
+      return this.categoriesService.findOne(categoryId);
     }
 
     // Se for agency_admin, só pode acessar categorias da própria agência
-    return this.tripCategoriesService.findOneByAgency(tripCategoryId, agencyId);
+    return this.categoriesService.findOneByAgency(categoryId, agencyId);
   }
 
-  @Patch(':tripCategoryId')
+  @Patch(':categoryId')
   @AllowRoles('superadmin', 'agency_admin')
   @RequireOwnership()
   @ApiOperation({
@@ -185,12 +185,12 @@ export class TripCategoriesController {
     format: 'uuid',
   })
   @ApiParam({
-    name: 'tripCategoryId',
+    name: 'categoryId',
     description: 'ID da categoria de viagem',
     type: 'string',
     format: 'uuid',
   })
-  @ApiBody({ type: UpdateTripCategoryDto })
+  @ApiBody({ type: UpdateCategoryDto })
   @ApiResponse({
     status: 200,
     description: 'Categoria de viagem atualizada com sucesso',
@@ -218,27 +218,24 @@ export class TripCategoriesController {
   })
   async update(
     @Param('agencyId', ParseUUIDPipe) agencyId: string,
-    @Param('tripCategoryId', ParseUUIDPipe) tripCategoryId: string,
-    @Body() updateTripCategoryDto: UpdateTripCategoryDto,
+    @Param('categoryId', ParseUUIDPipe) categoryId: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
     @CurrentUser() user: JwtPayload,
   ) {
     // Se for superadmin, pode atualizar qualquer categoria
     if (user.role === 'superadmin') {
-      return this.tripCategoriesService.update(
-        tripCategoryId,
-        updateTripCategoryDto,
-      );
+      return this.categoriesService.update(categoryId, updateCategoryDto);
     }
 
     // Se for agency_admin, só pode atualizar categorias da própria agência
-    return this.tripCategoriesService.updateByAgency(
-      tripCategoryId,
+    return this.categoriesService.updateByAgency(
+      categoryId,
       agencyId,
-      updateTripCategoryDto,
+      updateCategoryDto,
     );
   }
 
-  @Delete(':tripCategoryId')
+  @Delete(':categoryId')
   @AllowRoles('superadmin', 'agency_admin')
   @RequireOwnership()
   @ApiOperation({
@@ -253,7 +250,7 @@ export class TripCategoriesController {
     format: 'uuid',
   })
   @ApiParam({
-    name: 'tripCategoryId',
+    name: 'categoryId',
     description: 'ID da categoria de viagem',
     type: 'string',
     format: 'uuid',
@@ -271,15 +268,15 @@ export class TripCategoriesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(
     @Param('agencyId', ParseUUIDPipe) agencyId: string,
-    @Param('tripCategoryId', ParseUUIDPipe) tripCategoryId: string,
+    @Param('categoryId', ParseUUIDPipe) categoryId: string,
     @CurrentUser() user: JwtPayload,
   ) {
     // Se for superadmin, pode remover qualquer categoria
     if (user.role === 'superadmin') {
-      await this.tripCategoriesService.remove(tripCategoryId);
+      await this.categoriesService.remove(categoryId);
     } else {
       // Se for agency_admin, só pode remover categorias da própria agência
-      await this.tripCategoriesService.removeByAgency(tripCategoryId, agencyId);
+      await this.categoriesService.removeByAgency(categoryId, agencyId);
     }
   }
 }

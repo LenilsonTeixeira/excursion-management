@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { AgenciesModule } from './agencies/agencies.module';
 import { CancellationPoliciesModule } from './cancellation-policies/cancellation-policies.module';
+import { TripsModule } from './trips/trips.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CancellationPoliciesModule } from './cancellation-policies/cancellation
     TenantsModule,
     AgenciesModule,
     CancellationPoliciesModule,
+    TripsModule,
   ],
   controllers: [],
   providers: [],

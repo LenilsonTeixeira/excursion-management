@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
 
-export class CreateTripCategoryDto {
+export class CreateCategoryDto {
   @ApiProperty({
     description: 'Nome da categoria da viagem',
     example: 'Bate e Volta',

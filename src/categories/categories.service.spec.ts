@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TripCategoriesService } from './trip-categories.service';
-import { TripCategoriesRepository } from './trip-categories.repository';
+import { CategoriesService } from './categories.service';
+import { CategoriesRepository } from './categories.repository';
 import { NotFoundException, ConflictException } from '@nestjs/common';
-import { CreateTripCategoryDto } from './dto/create-trip-category.dto';
-import { UpdateTripCategoryDto } from './dto/update-trip-category.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
-describe('TripCategoriesService', () => {
-  let service: TripCategoriesService;
-  let repository: TripCategoriesRepository;
+describe('CategoriesService', () => {
+  let service: CategoriesService;
+  let repository: CategoriesRepository;
 
-  const mockTripCategory = {
+  const mockCategory = {
     id: 'trip-category-id-1',
     name: 'Bate e Volta',
     agencyId: 'agency-id-1',
@@ -17,20 +17,20 @@ describe('TripCategoriesService', () => {
     updatedAt: new Date('2025-01-01'),
   };
 
-  const mockCreateTripCategoryDto: CreateTripCategoryDto = {
+  const mockCreateCategoryDto: CreateCategoryDto = {
     name: 'Bate e Volta',
   };
 
-  const mockUpdateTripCategoryDto: UpdateTripCategoryDto = {
+  const mockUpdateCategoryDto: UpdateCategoryDto = {
     name: 'Viagem com Hospedagem',
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TripCategoriesService,
+        CategoriesService,
         {
-          provide: TripCategoriesRepository,
+          provide: CategoriesRepository,
           useValue: {
             create: jest.fn(),
             findAllByAgency: jest.fn(),
@@ -47,8 +47,8 @@ describe('TripCategoriesService', () => {
       ],
     }).compile();
 
-    service = module.get<TripCategoriesService>(TripCategoriesService);
-    repository = module.get<TripCategoriesRepository>(TripCategoriesRepository);
+    service = module.get<CategoriesService>(CategoriesService);
+    repository = module.get<CategoriesRepository>(CategoriesRepository);
   });
 
   it('should be defined', () => {
@@ -58,34 +58,31 @@ describe('TripCategoriesService', () => {
   describe('create', () => {
     it('should create a trip category successfully', async () => {
       jest.spyOn(repository, 'findByNameAndAgency').mockResolvedValue(null);
-      jest.spyOn(repository, 'create').mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'create').mockResolvedValue(mockCategory);
 
-      const result = await service.create(
-        'agency-id-1',
-        mockCreateTripCategoryDto,
-      );
+      const result = await service.create('agency-id-1', mockCreateCategoryDto);
 
       expect(repository.findByNameAndAgency).toHaveBeenCalledWith(
-        mockCreateTripCategoryDto.name,
+        mockCreateCategoryDto.name,
         'agency-id-1',
       );
       expect(repository.create).toHaveBeenCalledWith(
         'agency-id-1',
-        mockCreateTripCategoryDto,
+        mockCreateCategoryDto,
       );
-      expect(result).toEqual(mockTripCategory);
+      expect(result).toEqual(mockCategory);
     });
 
     it('should throw ConflictException when name already exists in agency', async () => {
       jest
         .spyOn(repository, 'findByNameAndAgency')
-        .mockResolvedValue(mockTripCategory);
+        .mockResolvedValue(mockCategory);
 
       await expect(
-        service.create('agency-id-1', mockCreateTripCategoryDto),
+        service.create('agency-id-1', mockCreateCategoryDto),
       ).rejects.toThrow(ConflictException);
       expect(repository.findByNameAndAgency).toHaveBeenCalledWith(
-        mockCreateTripCategoryDto.name,
+        mockCreateCategoryDto.name,
         'agency-id-1',
       );
     });
@@ -93,7 +90,7 @@ describe('TripCategoriesService', () => {
 
   describe('findAllByAgency', () => {
     it('should return all trip categories for an agency', async () => {
-      const tripCategories = [mockTripCategory];
+      const tripCategories = [mockCategory];
       jest
         .spyOn(repository, 'findAllByAgency')
         .mockResolvedValue(tripCategories);
@@ -107,12 +104,12 @@ describe('TripCategoriesService', () => {
 
   describe('findOne', () => {
     it('should return a trip category by id', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockCategory);
 
       const result = await service.findOne('trip-category-id-1');
 
       expect(repository.findOne).toHaveBeenCalledWith('trip-category-id-1');
-      expect(result).toEqual(mockTripCategory);
+      expect(result).toEqual(mockCategory);
     });
 
     it('should throw NotFoundException when trip category not found', async () => {
@@ -126,9 +123,7 @@ describe('TripCategoriesService', () => {
 
   describe('findOneByAgency', () => {
     it('should return a trip category by id and agency', async () => {
-      jest
-        .spyOn(repository, 'findOneByAgency')
-        .mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'findOneByAgency').mockResolvedValue(mockCategory);
 
       const result = await service.findOneByAgency(
         'trip-category-id-1',
@@ -139,7 +134,7 @@ describe('TripCategoriesService', () => {
         'trip-category-id-1',
         'agency-id-1',
       );
-      expect(result).toEqual(mockTripCategory);
+      expect(result).toEqual(mockCategory);
     });
 
     it('should throw NotFoundException when trip category not found in agency', async () => {
@@ -153,44 +148,44 @@ describe('TripCategoriesService', () => {
 
   describe('update', () => {
     it('should update a trip category successfully', async () => {
-      const updatedTripCategory = {
-        ...mockTripCategory,
-        ...mockUpdateTripCategoryDto,
+      const updatedCategory = {
+        ...mockCategory,
+        ...mockUpdateCategoryDto,
       };
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockCategory);
       jest.spyOn(repository, 'findByNameAndAgency').mockResolvedValue(null);
-      jest.spyOn(repository, 'update').mockResolvedValue(updatedTripCategory);
+      jest.spyOn(repository, 'update').mockResolvedValue(updatedCategory);
 
       const result = await service.update(
         'trip-category-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
       );
 
       expect(repository.findOne).toHaveBeenCalledWith('trip-category-id-1');
       expect(repository.update).toHaveBeenCalledWith(
         'trip-category-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
       );
-      expect(result).toEqual(updatedTripCategory);
+      expect(result).toEqual(updatedCategory);
     });
 
     it('should throw NotFoundException when trip category not found', async () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(null);
 
       await expect(
-        service.update('trip-category-id-1', mockUpdateTripCategoryDto),
+        service.update('trip-category-id-1', mockUpdateCategoryDto),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ConflictException when name already exists in agency', async () => {
       const updateDtoWithName = {
-        ...mockUpdateTripCategoryDto,
+        ...mockUpdateCategoryDto,
         name: 'Nome Duplicado',
       };
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockCategory);
       jest
         .spyOn(repository, 'findByNameAndAgency')
-        .mockResolvedValue(mockTripCategory);
+        .mockResolvedValue(mockCategory);
 
       await expect(
         service.update('trip-category-id-1', updateDtoWithName),
@@ -198,13 +193,13 @@ describe('TripCategoriesService', () => {
     });
 
     it('should not check name conflict when name is not being updated', async () => {
-      const updateDtoWithoutName: UpdateTripCategoryDto = {};
-      const updatedTripCategory = {
-        ...mockTripCategory,
+      const updateDtoWithoutName: UpdateCategoryDto = {};
+      const updatedCategory = {
+        ...mockCategory,
         ...updateDtoWithoutName,
       };
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockTripCategory);
-      jest.spyOn(repository, 'update').mockResolvedValue(updatedTripCategory);
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockCategory);
+      jest.spyOn(repository, 'update').mockResolvedValue(updatedCategory);
 
       const result = await service.update(
         'trip-category-id-1',
@@ -216,28 +211,26 @@ describe('TripCategoriesService', () => {
         'trip-category-id-1',
         updateDtoWithoutName,
       );
-      expect(result).toEqual(updatedTripCategory);
+      expect(result).toEqual(updatedCategory);
     });
   });
 
   describe('updateByAgency', () => {
     it('should update a trip category by agency successfully', async () => {
-      const updatedTripCategory = {
-        ...mockTripCategory,
-        ...mockUpdateTripCategoryDto,
+      const updatedCategory = {
+        ...mockCategory,
+        ...mockUpdateCategoryDto,
       };
-      jest
-        .spyOn(repository, 'findOneByAgency')
-        .mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'findOneByAgency').mockResolvedValue(mockCategory);
       jest.spyOn(repository, 'findByNameAndAgency').mockResolvedValue(null);
       jest
         .spyOn(repository, 'updateByAgency')
-        .mockResolvedValue(updatedTripCategory);
+        .mockResolvedValue(updatedCategory);
 
       const result = await service.updateByAgency(
         'trip-category-id-1',
         'agency-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
       );
 
       expect(repository.findOneByAgency).toHaveBeenCalledWith(
@@ -247,9 +240,9 @@ describe('TripCategoriesService', () => {
       expect(repository.updateByAgency).toHaveBeenCalledWith(
         'trip-category-id-1',
         'agency-id-1',
-        mockUpdateTripCategoryDto,
+        mockUpdateCategoryDto,
       );
-      expect(result).toEqual(updatedTripCategory);
+      expect(result).toEqual(updatedCategory);
     });
 
     it('should throw NotFoundException when trip category not found in agency', async () => {
@@ -259,22 +252,20 @@ describe('TripCategoriesService', () => {
         service.updateByAgency(
           'trip-category-id-1',
           'agency-id-1',
-          mockUpdateTripCategoryDto,
+          mockUpdateCategoryDto,
         ),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ConflictException when name already exists in agency', async () => {
       const updateDtoWithName = {
-        ...mockUpdateTripCategoryDto,
+        ...mockUpdateCategoryDto,
         name: 'Nome Duplicado',
       };
-      jest
-        .spyOn(repository, 'findOneByAgency')
-        .mockResolvedValue(mockTripCategory);
+      jest.spyOn(repository, 'findOneByAgency').mockResolvedValue(mockCategory);
       jest
         .spyOn(repository, 'findByNameAndAgency')
-        .mockResolvedValue(mockTripCategory);
+        .mockResolvedValue(mockCategory);
 
       await expect(
         service.updateByAgency(
